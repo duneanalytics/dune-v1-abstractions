@@ -324,12 +324,12 @@ WITH rows AS (
             '1inch' AS project,
             'UNI v2' AS version,
             'Aggregator' AS category,
-            t."from" AS trader_a,
+            trader_a,
             NULL::bytea AS trader_b,
             "output_returnAmount" AS token_a_amount_raw,
             "amount" AS token_b_amount_raw,
             NULL::numeric AS usd_amount,
-            (CASE WHEN ll.to = '\xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' AND substring("pools"[ARRAY_LENGTH("pools", 1)] from 1 for 1) IN ('\xc0', '\x40') THEN '\xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ELSE ll.to END) AS token_a_address,
+            "dstToken" AS token_a_address,
             (CASE WHEN "srcToken" = '\x0000000000000000000000000000000000000000' THEN '\xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ELSE "srcToken" END) AS token_b_address,
             us.contract_address AS exchange_contract_address,
             call_tx_hash,
@@ -368,7 +368,7 @@ WITH rows AS (
                 UNION ALL
 
                 select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
-                from oneinch."AggregationRouterV5_call_unoswap_withPermit"
+                from oneinch."AggregationRouterV5_call_unoswapToWithPermit"
                 where call_success
                     and call_block_time >= start_ts
                     and call_block_time < end_ts
