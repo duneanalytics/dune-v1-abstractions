@@ -93,7 +93,7 @@ WITH rows AS (
                 and t.block_time < end_ts)
 
             UNION ALL
-            SELECT sender as trader_a, "srcToken" as from_token, "dstToken" as to_token, "spentAmount" as from_amount, "returnAmount" as to_amount, evt_tx_hash as tx_hash, evt_block_time as block_time, NULL::integer[] as call_trace_address, evt_index, contract_address, '2' as version 
+            SELECT sender as trader_a, "srcToken" as from_token, "dstToken" as to_token, "spentAmount" as from_amount, "returnAmount" as to_amount, evt_tx_hash as tx_hash, evt_block_time as block_time, NULL::integer[] as call_trace_address, evt_index, contract_address, '2' as version
             FROM oneinch_v2."OneInchExchange_evt_Swapped"
             WHERE
                 evt_block_time >= start_ts
@@ -141,13 +141,13 @@ WITH rows AS (
                 SELECT "fromToken" as from_token, "toToken" as to_token, "tokensAmount" as from_amount, "minTokensAmount" as to_amount, call_tx_hash as tx_hash, call_block_time as block_time, call_trace_address as trace_address, NULL::integer as evt_index, contract_address, '1' as version FROM oneinch."exchange_v6_call_aggregate" WHERE call_success and call_block_time >= start_ts AND call_block_time < end_ts UNION ALL
                 SELECT "fromToken" as from_token, "toToken" as to_token, "fromTokenAmount" as from_amount, "minReturnAmount" as to_amount, call_tx_hash as tx_hash, call_block_time as block_time, call_trace_address as trace_address, NULL::integer as evt_index, contract_address, '1' as version FROM oneinch."exchange_v7_call_swap" WHERE call_success and call_block_time >= start_ts AND call_block_time < end_ts UNION ALL
                 SELECT "fromToken" as from_token, "toToken" as to_token, "fromTokenAmount" as from_amount, "minReturnAmount" as to_amount, call_tx_hash as tx_hash, call_block_time as block_time, call_trace_address as trace_address, NULL::integer as evt_index, contract_address, '1' as version FROM oneinch."OneInchExchange_call_swap" WHERE call_success and call_block_time >= start_ts AND call_block_time < end_ts UNION ALL
-                SELECT "srcToken" as from_token, "dstToken" as to_token, "spentAmount" as from_amount, "returnAmount" as to_amount, evt_tx_hash as tx_hash, evt_block_time as block_time, NULL::integer[] as call_trace_address, evt_index, contract_address, '2' as version 
-                    FROM oneinch_v2."OneInchExchange_evt_Swapped" 
+                SELECT "srcToken" as from_token, "dstToken" as to_token, "spentAmount" as from_amount, "returnAmount" as to_amount, evt_tx_hash as tx_hash, evt_block_time as block_time, NULL::integer[] as call_trace_address, evt_index, contract_address, '2' as version
+                    FROM oneinch_v2."OneInchExchange_evt_Swapped"
                     WHERE
                         evt_block_time >= start_ts
-                        and evt_block_time < end_ts 
+                        and evt_block_time < end_ts
                 UNION ALL
-                SELECT "srcToken" as from_token, "dstToken" as to_token, "spentAmount" as from_amount, "returnAmount" as to_amount, evt_tx_hash as tx_hash, evt_block_time as block_time, NULL::integer[] as call_trace_address, evt_index, contract_address, '3' as version 
+                SELECT "srcToken" as from_token, "dstToken" as to_token, "spentAmount" as from_amount, "returnAmount" as to_amount, evt_tx_hash as tx_hash, evt_block_time as block_time, NULL::integer[] as call_trace_address, evt_index, contract_address, '3' as version
                     FROM oneinch_v3."AggregationRouterV3_evt_Swapped"
                     WHERE
                         evt_block_time >= start_ts
@@ -203,7 +203,7 @@ WITH rows AS (
 
             ) t
         )
-        
+
         UNION ALL
 
         -- 1inch 0x Limit Orders
@@ -225,21 +225,21 @@ WITH rows AS (
             evt_index
         FROM (
             select "feeRecipientAddress", "takerAssetData", "makerAssetData", "makerAddress", "takerAddress", "makerAssetFilledAmount", "takerAssetFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index
-            from zeroex_v2."Exchange2.0_evt_Fill" 
+            from zeroex_v2."Exchange2.0_evt_Fill"
             where evt_block_time >= start_ts
                 and evt_block_time < end_ts
             union all -- 0x v1
-            select "feeRecipientAddress", "takerAssetData", "makerAssetData", "makerAddress", "takerAddress", "makerAssetFilledAmount", "takerAssetFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index 
-            from zeroex_v2."Exchange2.1_evt_Fill" 
+            select "feeRecipientAddress", "takerAssetData", "makerAssetData", "makerAddress", "takerAddress", "makerAssetFilledAmount", "takerAssetFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index
+            from zeroex_v2."Exchange2.1_evt_Fill"
             where evt_block_time >= start_ts
                 and evt_block_time < end_ts
             union all -- 0x v2
-            select "feeRecipientAddress", "takerAssetData", "makerAssetData", "makerAddress", "takerAddress", "makerAssetFilledAmount", "takerAssetFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index 
-            from zeroex_v3."Exchange_evt_Fill" 
+            select "feeRecipientAddress", "takerAssetData", "makerAssetData", "makerAddress", "takerAddress", "makerAssetFilledAmount", "takerAssetFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index
+            from zeroex_v3."Exchange_evt_Fill"
             where evt_block_time >= start_ts
                 and evt_block_time < end_ts
             union all -- 0x v3
-            select "feeRecipient", "takerToken", "makerToken", "maker", "taker", "makerTokenFilledAmount", "takerTokenFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index 
+            select "feeRecipient", "takerToken", "makerToken", "maker", "taker", "makerTokenFilledAmount", "takerTokenFilledAmount", contract_address, evt_block_time, evt_tx_hash, evt_index
             from zeroex."ExchangeProxy_evt_LimitOrderFilled" -- 0x v4
             where evt_block_time >= start_ts
                 and evt_block_time < end_ts
@@ -266,26 +266,26 @@ WITH rows AS (
             call_trace_address AS trace_address,
             NULL::integer AS evt_index
         FROM (
-            select "output_returnAmount", "amount", "srcToken", "_3" as pools, "call_tx_hash", "call_trace_address", "call_block_time", "contract_address" 
-            from oneinch_v3."AggregationRouterV3_call_unoswap" 
-            where call_success 
+            select "output_returnAmount", "amount", "srcToken", "_3" as pools, "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
+            from oneinch_v3."AggregationRouterV3_call_unoswap"
+            where call_success
                 and call_block_time >= start_ts
                 and call_block_time < end_ts
             union all
-            select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address" 
-            from oneinch_v3."AggregationRouterV3_call_unoswapWithPermit" 
+            select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
+            from oneinch_v3."AggregationRouterV3_call_unoswapWithPermit"
             where call_success
                 and call_block_time >= start_ts
                 and call_block_time < end_ts
             UNION ALL
-            select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address" 
-            from oneinch_v4."AggregationRouterV4_call_unoswap"  
-            where call_success 
+            select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
+            from oneinch_v4."AggregationRouterV4_call_unoswap"
+            where call_success
                 and call_block_time >= start_ts
                 and call_block_time < end_ts
             union all
-            select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address" 
-            from oneinch_v4."AggregationRouterV4_call_unoswapWithPermit"  
+            select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
+            from oneinch_v4."AggregationRouterV4_call_unoswapWithPermit"
             where call_success
                 and call_block_time >= start_ts
                 and call_block_time < end_ts
@@ -305,16 +305,80 @@ WITH rows AS (
         left join ethereum.traces t on us.call_tx_hash = t.tx_hash and us.call_trace_address = t.trace_address
             and t.block_time >= start_ts
             and t.block_time < end_ts
-        LEFT JOIN ethereum.traces tr ON tr.tx_hash = us.call_tx_hash 
+        LEFT JOIN ethereum.traces tr ON tr.tx_hash = us.call_tx_hash
             AND tr.trace_address = us.call_trace_address[:ARRAY_LENGTH(us.call_trace_address, 1)-1]
             and tr.block_time >= start_ts
             and tr.block_time < end_ts
-        LEFT JOIN ethereum.traces ll ON ll.tx_hash = us.call_tx_hash 
+        LEFT JOIN ethereum.traces ll ON ll.tx_hash = us.call_tx_hash
             AND ll.trace_address = (
                 us.call_trace_address || (ARRAY_LENGTH("pools", 1)*2 + CASE WHEN "srcToken" = '\x0000000000000000000000000000000000000000' THEN 1 ELSE 0 END) || 0
                 )
             and ll.block_time >= start_ts
             and ll.block_time < end_ts
+
+        UNION ALL
+
+        -- 1inch Unoswap for V5 Router
+        SELECT
+            call_block_time as block_time,
+            '1inch' AS project,
+            'UNI v2' AS version,
+            'Aggregator' AS category,
+            trader_a,
+            NULL::bytea AS trader_b,
+            "output_returnAmount" AS token_a_amount_raw,
+            "amount" AS token_b_amount_raw,
+            NULL::numeric AS usd_amount,
+            "dstToken" AS token_a_address,
+            (CASE WHEN "srcToken" = '\x0000000000000000000000000000000000000000' THEN '\xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee' ELSE "srcToken" END) AS token_b_address,
+            us.contract_address AS exchange_contract_address,
+            call_tx_hash,
+            call_trace_address AS trace_address,
+            NULL::integer AS evt_index
+        FROM (
+            select
+                "output_returnAmount"
+                , "amount"
+                , "srcToken",
+                CASE WHEN ((pools[array_length(pools, 1)] / 2^252)::int & 2 <> 0) THEN '\xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+                ELSE
+                    (
+                        select tr2.to
+                        from ethereum.traces tr2
+                        where call_type = 'call'
+                        and tr2.block_time >= start_ts
+                        and tr2.block_time < end_ts
+                        and tr2.tx_hash = call_tx_hash
+                        and substring(tr2.input from 1 for 4) = '\xa9059cbb'
+                        and COALESCE(call_trace_address, array[]::int[]) = tr2.trace_address[:COALESCE(ARRAY_LENGTH(call_trace_address, 1), 0)]
+                        and COALESCE(ARRAY_LENGTH(call_trace_address, 1), 0) + 2 = COALESCE(ARRAY_LENGTH(tr2.trace_address, 1), 0)
+                        and tr2.from <> contract_address
+                        order by COALESCE(trace_address, array[]::int[]) desc
+                        LIMIT 1
+                    )
+                END as "dstToken"
+                ,"pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address", t."from" as trader_a
+            from (
+                select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
+                from oneinch."AggregationRouterV5_call_unoswap"
+                where call_success
+                    and call_block_time >= start_ts
+                    and call_block_time < end_ts
+
+                UNION ALL
+
+                select "output_returnAmount", "amount", "srcToken", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address"
+                from oneinch."AggregationRouterV5_call_unoswapToWithPermit"
+                where call_success
+                    and call_block_time >= start_ts
+                    and call_block_time < end_ts
+            ) sw
+            left join ethereum.traces t
+            on t.tx_hash = sw.call_tx_hash
+            and t.trace_address = sw.call_trace_address
+            and t.block_time >= start_ts
+            and t.block_time < end_ts
+        ) us
 
         UNION ALL
 
@@ -340,12 +404,12 @@ WITH rows AS (
                 "output_returnAmount"
                 , "amount"
                 ,COALESCE((
-                    select tr1.to 
-                    from ethereum.traces tr1 
-                    where call_type = 'call' 
+                    select tr1.to
+                    from ethereum.traces tr1
+                    where call_type = 'call'
                     and tr1.block_time >= start_ts
                     and tr1.block_time < end_ts
-                    and tr1.tx_hash = call_tx_hash 
+                    and tr1.tx_hash = call_tx_hash
                     and substring(tr1.input from 1 for 4) = '\x23b872dd'
                     and COALESCE(call_trace_address, array[]::int[]) = tr1.trace_address[:COALESCE(ARRAY_LENGTH(call_trace_address, 1), 0)]
                     and COALESCE(ARRAY_LENGTH(call_trace_address, 1), 0) + 3 = COALESCE(ARRAY_LENGTH(tr1.trace_address, 1), 0)
@@ -357,11 +421,11 @@ WITH rows AS (
                 ELSE
                     (
                         select tr2.to
-                        from ethereum.traces tr2 
-                        where call_type = 'call' 
+                        from ethereum.traces tr2
+                        where call_type = 'call'
                         and tr2.block_time >= start_ts
                         and tr2.block_time < end_ts
-                        and tr2.tx_hash = call_tx_hash 
+                        and tr2.tx_hash = call_tx_hash
                         and substring(tr2.input from 1 for 4) = '\xa9059cbb'
                         and COALESCE(call_trace_address, array[]::int[]) = tr2.trace_address[:COALESCE(ARRAY_LENGTH(call_trace_address, 1), 0)]
                         and COALESCE(ARRAY_LENGTH(call_trace_address, 1), 0) + 2 = COALESCE(ARRAY_LENGTH(tr2.trace_address, 1), 0)
@@ -379,9 +443,9 @@ WITH rows AS (
                 select "output_returnAmount", "amount", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address" from oneinch."AggregationRouterV5_call_uniswapV3SwapTo" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
                 select "output_returnAmount", "amount", "pools", "call_tx_hash", "call_trace_address", "call_block_time", "contract_address" from oneinch."AggregationRouterV5_call_uniswapV3SwapToWithPermit" where call_success and call_block_time >= start_ts and call_block_time < end_ts
             ) sw
-            left join ethereum.traces t 
-            on t.tx_hash = sw.call_tx_hash 
-            and t.trace_address = sw.call_trace_address
+                left join ethereum.traces t
+                on t.tx_hash = sw.call_tx_hash
+                and t.trace_address = sw.call_trace_address
             and t.block_time >= start_ts
             and t.block_time < end_ts
         ) us
@@ -441,7 +505,7 @@ WITH rows AS (
             select '2' as version, decode(substring("order"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch_lop_v2."LimitOrderProtocol_call_fillOrder" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
             select '2' as version, decode(substring("order"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch_lop_v2."LimitOrderProtocol_call_fillOrderTo" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
             select '2' as version, decode(substring("order"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch_lop_v2."LimitOrderProtocol_call_fillOrderToWithPermit" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
-            select '3' as version, decode(substring("order_"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order_" as order, "output_actualTakingAmount" as output_0, "output_actualMakingAmount" as output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderTo" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
+            select '3' as version, decode(substring("order_"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order_" as order, "output_actualMakingAmount" as output_0, "output_actualTakingAmount" as output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderTo" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
             select '3' as version, decode(substring("order"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderToWithPermit" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
             select '3' as version, decode(substring("order"::jsonb->>'maker' from 3 for 40), 'hex') as maker, contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrder" where call_success and call_block_time >= start_ts and call_block_time < end_ts
         ) call
@@ -525,27 +589,27 @@ WITH rows AS (
             call_trace_address,
             NULL AS evt_index
         FROM oneinch."LimitOrderProtocol_call_fillOrderRFQ" call
-        LEFT JOIN ethereum.traces ts 
-            ON call_tx_hash = ts.tx_hash 
+        LEFT JOIN ethereum.traces ts
+            ON call_tx_hash = ts.tx_hash
             AND ts.trace_address = call_trace_address
             and ts.block_time >= start_ts
             and ts.block_time < end_ts
-        LEFT JOIN ethereum.traces tf1 
-            ON call_tx_hash = tf1.tx_hash 
+        LEFT JOIN ethereum.traces tf1
+            ON call_tx_hash = tf1.tx_hash
             AND tf1.trace_address = COALESCE(call_trace_address, '{}') || (ts.sub_traces-2)
             and tf1.block_time >= start_ts
             and tf1.block_time < end_ts
-        LEFT JOIN ethereum.traces tf2 
-            ON call_tx_hash = tf2.tx_hash 
+        LEFT JOIN ethereum.traces tf2
+            ON call_tx_hash = tf2.tx_hash
             AND tf2.trace_address = COALESCE(call_trace_address, '{}') || (ts.sub_traces-1)
             and tf2.block_time >= start_ts
             and tf2.block_time < end_ts
-        WHERE call.call_success 
-            and call.call_block_time >= start_ts 
+        WHERE call.call_success
+            and call.call_block_time >= start_ts
             and call.call_block_time < end_ts
 
         UNION ALL
-        
+
         -- 1inch Limit Order Protocol RFQ v2
         SELECT
             call_block_time as block_time,
@@ -593,7 +657,7 @@ WITH rows AS (
             NULL AS evt_index
         FROM (
             select contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderRFQ" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
-            select contract_address, "order", "output_filledTakingAmount" as output_0, "output_filledMakingAmount" as output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderRFQTo" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
+            select contract_address, "order", "output_filledMakingAmount" as output_0, "output_filledTakingAmount" as output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderRFQTo" where call_success and call_block_time >= start_ts and call_block_time < end_ts union all
             select contract_address, "order", output_0, output_1, call_block_time, call_tx_hash, call_trace_address from oneinch."AggregationRouterV5_call_fillOrderRFQToWithPermit" where call_success and call_block_time >= start_ts and call_block_time < end_ts
         ) call
         LEFT JOIN ethereum.traces ts ON call_tx_hash = ts.tx_hash AND call_trace_address = ts.trace_address
