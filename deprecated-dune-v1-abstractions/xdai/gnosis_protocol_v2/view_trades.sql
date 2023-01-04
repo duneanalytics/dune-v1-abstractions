@@ -1053,16 +1053,12 @@ valued_trades as (
                 WHEN sell_price IS NOT NULL THEN
                     CASE
                         -- Units sold is sometimes zero we add this
-                        WHEN units_sold = 0
-                            THEN 0
-                        WHEN buy_price IS NOT NULL AND buy_price * units_bought > sell_price * units_sold
-                            THEN buy_price * units_bought * fee / units_sold
-                        ELSE sell_price * fee
-                        END
-                WHEN sell_price IS NULL AND buy_price IS NOT NULL
-                    THEN buy_price * units_bought * fee / units_sold
+                        WHEN units_sold = 0 THEN 0
+                        WHEN sell_price IS NOT NULL THEN sell_price * fee
+                    END
+                WHEN buy_price IS NOT NULL THEN buy_price * units_bought * fee / units_sold
                 ELSE NULL::numeric
-               END)                 as fee_usd
+           END)                 as fee_usd
     FROM trades_with_token_units
 )
 
