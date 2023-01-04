@@ -120,10 +120,9 @@ BEGIN
                        fee_atoms,
                        (CASE
                             WHEN sell_price IS NOT NULL THEN sell_price * fee
-                            WHEN sell_price IS NULL AND buy_price IS NOT NULL
-                                THEN buy_price * units_bought * fee / units_sold
+                            WHEN buy_price IS NOT NULL THEN buy_price * units_bought * fee / units_sold
                             ELSE NULL::numeric
-                           END)                                        as fee_usd,
+                        END)                                           as fee_usd,
                        app_data,
                        CONCAT('\x', substring(receiver from 3))::bytea as receiver
                 FROM trades_with_token_units
