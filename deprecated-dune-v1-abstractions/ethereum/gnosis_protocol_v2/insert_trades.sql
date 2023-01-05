@@ -119,16 +119,15 @@ BEGIN
                        fee,
                        fee_atoms,
                        (CASE
-                            WHEN sell_price IS NOT NULL THEN
-                                CASE
-                                    WHEN buy_price IS NOT NULL and buy_price * units_bought > sell_price * units_sold
-                                        then buy_price * units_bought * fee / units_sold
-                                    ELSE sell_price * fee
-                                    END
-                            WHEN sell_price IS NULL AND buy_price IS NOT NULL
-                                THEN buy_price * units_bought * fee / units_sold
+                            WHEN sell_price IS NOT NULL THEN sell_price * fee
+                           -- Note that this formulation is subject to some precision error in a few irregular cases: 
+                           -- E.g. In this transaction 0x84d57d1d57e01dd34091c763765ddda6ff713ad67840f39735f0bf0cced11f02
+                           -- buy_price * units_bought * fee / units_sold
+                           -- 1.001076 * 0.005 * 0.0010148996324193 / 3e-18 = 1693319440706.3
+                           -- So, if sell_price had been null here (thankfully it is not), we would have a vastly inaccurate fee valuation
+                            WHEN buy_price IS NOT NULL THEN buy_price * units_bought * fee / units_sold
                             ELSE NULL::numeric
-                           END)                                        as fee_usd,
+                        END)                                           as fee_usd,
                        app_data,
                        CONCAT('\x', substring(receiver from 3))::bytea as receiver
                 FROM trades_with_token_units
@@ -208,43 +207,43 @@ SELECT gnosis_protocol_v2.insert_trades(
            )
            ;
 
--- For the two cron jobs defined below,
--- one is intended to back fill lagging price feed (while also including most recent trades).
--- The second, less frequent job is meant to back fill missing token data that is manually
--- updated on an irregular schedule. A three month time window should suffice for manual token updates.
+-- -- For the two cron jobs defined below,
+-- -- one is intended to back fill lagging price feed (while also including most recent trades).
+-- -- The second, less frequent job is meant to back fill missing token data that is manually
+-- -- updated on an irregular schedule. A three month time window should suffice for manual token updates.
 
--- Every five minutes we go back 1 day and repopulate the values.
--- This captures new trades since the previous run, but also includes
--- previously non-existent price data (since the price feed is slightly behind)
-INSERT INTO cron.job (schedule, command)
-VALUES ('*/5 * * * *', $$
-    BEGIN;
-    DELETE FROM gnosis_protocol_v2.trades
-        WHERE block_time >= (SELECT DATE_TRUNC('day', now()) - INTERVAL '1 days');
-    SELECT gnosis_protocol_v2.insert_trades(
-        (SELECT DATE_TRUNC('day', now()) - INTERVAL '1 days')
-    );
-    COMMIT;
-$$)
-ON CONFLICT (command) DO UPDATE SET schedule=EXCLUDED.schedule;
+-- -- Every five minutes we go back 1 day and repopulate the values.
+-- -- This captures new trades since the previous run, but also includes
+-- -- previously non-existent price data (since the price feed is slightly behind)
+-- INSERT INTO cron.job (schedule, command)
+-- VALUES ('*/5 * * * *', $$
+--     BEGIN;
+--     DELETE FROM gnosis_protocol_v2.trades
+--         WHERE block_time >= (SELECT DATE_TRUNC('day', now()) - INTERVAL '1 days');
+--     SELECT gnosis_protocol_v2.insert_trades(
+--         (SELECT DATE_TRUNC('day', now()) - INTERVAL '1 days')
+--     );
+--     COMMIT;
+-- $$)
+-- ON CONFLICT (command) DO UPDATE SET schedule=EXCLUDED.schedule;
 
--- Once per day we go back 3 months repopulate the values.
--- This is intended to back fill any new erc20 token data that may have been introduced.
--- While simultaneously updating all fields relying on token data. Specifically, these are:
--- buy_token, sell_token, (for the symbol) and
--- trade_value_usd, units_bought, units_sold, sell_price, buy_price, fee, fee_usd (requiring token decimals).
---
--- NOTE that we choose to run this job daily at 1 minute past midnight,
--- so not to compete with the every 5 minute job above
-INSERT INTO cron.job (schedule, command)
-VALUES ('1 0 * * *', $$
-    BEGIN;
-    DELETE FROM gnosis_protocol_v2.trades
-        WHERE block_time >= (SELECT DATE_TRUNC('day', now()) - INTERVAL '3 months');
-    SELECT gnosis_protocol_v2.insert_trades(
-        (SELECT DATE_TRUNC('day', now()) - INTERVAL '3 months')
-    );
-    COMMIT;
-$$)
-ON CONFLICT (command) DO UPDATE SET schedule=EXCLUDED.schedule;
+-- -- Once per day we go back 3 months repopulate the values.
+-- -- This is intended to back fill any new erc20 token data that may have been introduced.
+-- -- While simultaneously updating all fields relying on token data. Specifically, these are:
+-- -- buy_token, sell_token, (for the symbol) and
+-- -- trade_value_usd, units_bought, units_sold, sell_price, buy_price, fee, fee_usd (requiring token decimals).
+-- --
+-- -- NOTE that we choose to run this job daily at 1 minute past midnight,
+-- -- so not to compete with the every 5 minute job above
+-- INSERT INTO cron.job (schedule, command)
+-- VALUES ('1 0 * * *', $$
+--     BEGIN;
+--     DELETE FROM gnosis_protocol_v2.trades
+--         WHERE block_time >= (SELECT DATE_TRUNC('day', now()) - INTERVAL '3 months');
+--     SELECT gnosis_protocol_v2.insert_trades(
+--         (SELECT DATE_TRUNC('day', now()) - INTERVAL '3 months')
+--     );
+--     COMMIT;
+-- $$)
+-- ON CONFLICT (command) DO UPDATE SET schedule=EXCLUDED.schedule;
 COMMIT;

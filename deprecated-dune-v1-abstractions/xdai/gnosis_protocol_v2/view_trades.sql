@@ -1053,16 +1053,12 @@ valued_trades as (
                 WHEN sell_price IS NOT NULL THEN
                     CASE
                         -- Units sold is sometimes zero we add this
-                        WHEN units_sold = 0
-                            THEN 0
-                        WHEN buy_price IS NOT NULL AND buy_price * units_bought > sell_price * units_sold
-                            THEN buy_price * units_bought * fee / units_sold
-                        ELSE sell_price * fee
-                        END
-                WHEN sell_price IS NULL AND buy_price IS NOT NULL
-                    THEN buy_price * units_bought * fee / units_sold
+                        WHEN units_sold = 0 THEN 0
+                        WHEN sell_price IS NOT NULL THEN sell_price * fee
+                    END
+                WHEN buy_price IS NOT NULL THEN buy_price * units_bought * fee / units_sold
                 ELSE NULL::numeric
-               END)                 as fee_usd
+           END)                 as fee_usd
     FROM trades_with_token_units
 )
 
@@ -1094,8 +1090,8 @@ CREATE INDEX view_trades_idx_4 ON gnosis_protocol_v2.view_trades (trader);
 CREATE INDEX view_trades_idx_6 ON gnosis_protocol_v2.view_trades (tx_hash);
 
 
-INSERT INTO cron.job (schedule, command)
-VALUES ('*/30 * * * *', 'REFRESH MATERIALIZED VIEW CONCURRENTLY gnosis_protocol_v2.view_trades')
-ON CONFLICT (command) DO UPDATE SET schedule=EXCLUDED.schedule;
+-- INSERT INTO cron.job (schedule, command)
+-- VALUES ('*/30 * * * *', 'REFRESH MATERIALIZED VIEW CONCURRENTLY gnosis_protocol_v2.view_trades')
+-- ON CONFLICT (command) DO UPDATE SET schedule=EXCLUDED.schedule;
 
 COMMIT;
