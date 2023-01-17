@@ -275,7 +275,12 @@ WITH token_extention
                       ('TKN', 8, decode('D1B11356464Ac5B48172fa6bD14Ac2417631BEDa', 'hex')),
                       ('O3', 18, decode('Ee9801669C6138E84bD50dEB500827b776777d28', 'hex')),
                       ('MLN', 18, decode('f0dd817FF483535f4059781441596AEa4F32a4B9', 'hex')),
-                     ('yvCurve-3pool', 18, decode('Ffe9fa48A805AC26eEF9DC750765C4dFB530f70b', 'hex'))
+                    ('yvCurve-3pool', 18, decode('Ffe9fa48A805AC26eEF9DC750765C4dFB530f70b', 'hex')),
+                    ('BER', 18, decode('05698e7346Ea67Cfb088f64Ad8962B18137d17c0', 'hex')),
+                    ('MTA', 18, decode('5B9EED77d9500aDF7200fEeB395647be1950F7d2', 'hex')),
+                    ('INDEX', 18, decode('6052245Ec516D0F653794052D24EFca8A39fcBC3', 'hex')),
+                    ('7MT', 18, decode('60c5C8aD6F298797305C87c9AD5af5135670e0d9', 'hex')),
+                    ('FCL', 18, decode('e68856eb29B2FB39699286CcA7F10f90Ce8AE9De', 'hex'))
              ) as unlisted (symbol, decimals, contract_address)
     )
 
