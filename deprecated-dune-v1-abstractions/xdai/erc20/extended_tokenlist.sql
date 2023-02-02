@@ -280,6 +280,7 @@ WITH token_extention
                     ('MTA', 18, decode('5B9EED77d9500aDF7200fEeB395647be1950F7d2', 'hex')),
                     ('INDEX', 18, decode('6052245Ec516D0F653794052D24EFca8A39fcBC3', 'hex')),
                     ('7MT', 18, decode('60c5C8aD6F298797305C87c9AD5af5135670e0d9', 'hex')),
+                    ('EURe', 18, decode('cB444e90D8198415266c6a2724b7900fb12FC56E', 'hex')),
                     ('FCL', 18, decode('e68856eb29B2FB39699286CcA7F10f90Ce8AE9De', 'hex'))
              ) as unlisted (symbol, decimals, contract_address)
     )
