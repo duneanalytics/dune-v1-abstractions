@@ -124,6 +124,7 @@ WITH rows AS (
             FROM balancer_v2.view_bpt_prices
             WHERE hour <= dexs.block_time
             AND contract_address = dexs.token_b_address
+            AND median_price IS NOT NULL
         )
         AND bpa.hour >= start_ts
         AND bpa.hour < end_ts
@@ -133,6 +134,7 @@ WITH rows AS (
             FROM balancer_v2.view_bpt_prices
             WHERE hour <= dexs.block_time
             AND contract_address = dexs.token_b_address
+            AND median_price IS NOT NULL
         )
         AND bpb.hour >= start_ts
         AND bpb.hour < end_ts
